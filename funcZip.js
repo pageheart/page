@@ -25,3 +25,15 @@ function underper(a, b) {
   
   return LowerVal;
 }
+
+//Title dot display
+//Dom sel : Selector
+function titleDotLine(sel) {
+  document.querySelectorAll(sel).forEach(o => {
+    o.style.width = o.offsetWidth-4 + "px";
+    o.style.textOverflow = "ellipsis";
+    o.style.whiteSpace = "nowrap";
+    o.style.overflow = "hidden";
+    o.style.display = "inline-block";
+  });
+}
