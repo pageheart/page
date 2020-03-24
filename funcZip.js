@@ -37,3 +37,12 @@ function titleDotLine(sel) {
     o.style.display = "inline-block";
   });
 }
+
+//closure ex
+function add_maker(a){
+  return function(b) {
+    return a + b;
+  }
+}
+var add = add_maker(10);
+console.log(add(20)); //30
