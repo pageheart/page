@@ -46,3 +46,42 @@ function add_maker(a){
 }
 var add = add_maker(10);
 console.log(add(20)); //30
+
+//the coordinates of the remaining one point needed to create a rectangle.
+//Array arr : [[1, 5], [3, 5], [3, 11]]
+//output : [1, 11]
+function rectangle(arr) {
+  var x = [];
+  var y = [];
+
+  arr.forEach(
+    (o) => {
+      o.forEach(
+        (o,i,a) => {
+          if(i === 0) {
+            const temp = x.findIndex(o => o === a[i]);
+            if(temp > -1) 
+              x.splice(temp,1);
+            else 
+              x.push(a[i]);
+          }
+          else if(i === 1) {
+            const temp = y.findIndex(o => o === a[i]);
+            if(temp > -1) 
+              y.splice(temp,1);
+            else 
+              y.push(a[i]);
+          }
+        }
+      )
+    }
+  );
+
+  var answer = [];
+
+  answer.push(x[0]);
+  answer.push(y[0]);
+
+  return answer;
+
+}
