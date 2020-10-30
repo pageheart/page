@@ -85,3 +85,24 @@ function rectangle(arr) {
   return answer;
 
 }
+
+//class field same name copy
+function objectFieldCopy(obj, copyObj) {
+  if(obj === undefined || copyObj === undefined) 
+    return copyObj;
+  
+  let fields = Object.getOwnPropertyNames(copyObj);
+  
+  if(fields.length > 0) {
+    for(let key in obj) {
+      fields.forEach(o => {
+        if(key === field) {
+          copyObj[field] = obj[key];
+        }
+      });
+    }
+  }
+  
+  return copyObj;
+}
+    
