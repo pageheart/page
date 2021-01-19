@@ -105,4 +105,46 @@ function objectFieldCopy(obj, copyObj) {
   
   return copyObj;
 }
+
+//phone number setting format : 000-0000-0000
+function phoneNumCk(str) {
+  if(str !== undefined && str.length > 0) {
+    if(Number(str.charAt(str.length-1)) > -1) {
+      str = str.replace(/-/g,'');
+      if(str.length >= 4 && str.length < 7) {
+        if(str.indexOf('-') < 0) {
+          str = str.substr(0,3) + '-' + str.substr(3);
+        }
+      }
+      else if(str.length >= 7 && str.length < 11) {
+        if(str.indexOf('-') < 0 || str.indexOf('-') > 6) {
+          str = str.substr(0,3) + '-' + str.substr(3);
+        }
+        if(str.indexOf('-',7) < 0) {
+          str = str.substr(0,7) + '-' + str.substr(7);
+        }
+      }
+      else if(str.length >= 11) {
+        str = str.substr(0,3) + '-' + str.substr(3,4) + '-' + str.substr(7);
+      }
+    }
+    else {
+      if(str.length > 13) {
+        str = str.substr(0,13);
+      }
+      
+      let cnt = str.length;
+      for(let i=cnt; i>=0; i--) {
+        if(Number(str.charAt(i-1)) > -1) {
+          break;
+        }
+        else {
+          str = str.substr(0,i-1);
+        }
+      }
+    }
+    
+    return str;
+  }
+
     
