@@ -147,4 +147,23 @@ function phoneNumCk(str) {
     return str;
   }
 
-    
+//Check the presence of keys in the object
+function objHasKey(obj, key) {
+  let result = false;
+  
+  if(obj != undefined && obj instanceof Object) {
+    result = Object.keys(obj).some(
+      o => {
+        if(o == key) {
+          return true;
+        }
+        else if(obj[o].constructor.name == "Object") {
+          result = this.objHasKey(obj[o], key);
+        }
+      }
+    );
+  }
+  
+  return result;
+}
+  
