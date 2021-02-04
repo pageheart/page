@@ -159,6 +159,7 @@ function objHasKey(obj, key) {
         }
         else if(obj[o].constructor.name == "Object") {
           result = this.objHasKey(obj[o], key);
+          if(result) return true;
         }
       }
     );
