@@ -168,3 +168,12 @@ function objHasKey(obj, key) {
   return result;
 }
   
+//Check Between Day
+function dateBetween(inDate, inBtDay) {
+  let inputDate = new Date(replaceAll(replaceAll(inDate, '.', '-'), ' ', 'T'));
+  let toDate = new Date();
+  let betweenDay = (toDate.getTime() - inputDate.getTime()) / (1000*60*60*24);
+  
+  if(betweenDay < inBtDay) return true;
+  else return false;
+}
