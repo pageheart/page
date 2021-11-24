@@ -177,3 +177,16 @@ function dateBetween(inDate, inBtDay) {
   if(betweenDay < inBtDay) return true;
   else return false;
 }
+  
+//maxlength Check
+document.addEventListener("DOMContentLoaded", function(){
+    document.querySelectorAll("input").forEach(e=>{
+        if(e.getAttribute("maxlength")) {
+            e.addEventListener("keyup", (ev)=>{
+                if(ev.target.value.length > e.getAttribute("maxlength")) {
+                    ev.target.value = ev.target.value.substr(0,e.getAttribute("maxlength"));
+                }
+            });
+        }
+    });
+});
