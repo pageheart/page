@@ -1,0 +1,618 @@
+<!DOCTYPE HTML>
+<html lang="ko" class="hdmf">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no">
+<title>메뉴관리</title>
+
+<style type="text/css">
+	tr.bg_over:hover {background:#F5F5F5; cursor:pointer;}
+</style>
+
+<script type="text/javascript">
+var menuList = undefined; //실 메뉴
+var newMenuList = new Array(); //메뉴 order관련 재정의
+var menuSelectObj = undefined; //선택된 메뉴
+var orderChangeBool = false;
+$(document).ready(function() {
+	//[{"deny":"CD0701,CD0705","code":1,"depth":1,"use_yn":"Y","name":"water","link":"water.com","parent_code":0,"order":2},{"deny":"CD0701","code":2,"depth":1,"use_yn":"Y","name":"coffee","link":"coffee.com","parent_code":0,"order":1},{"deny":"","code":3,"depth":1,"use_yn":"Y","name":"cookie","link":"cookie.com","parent_code":0,"order":3},{"deny":"","code":5,"depth":2,"use_yn":"Y","name":"americano","link":"americano.com","parent_code":2,"order":2},{"deny":"","code":4,"depth":2,"use_yn":"Y","name":"cafelatte","link":"cafelatte.com","parent_code":2,"order":1},{"deny":"CD0704","code":6,"depth":3,"use_yn":"Y","name":"latte","link":"latte.com","parent_code":4,"order":1}];
+	menuList = JSON.parse('${menu}');
+	menuListSet(menuList);
+	$("#menuSortable").sortable({
+		//stop : (event, ui) => { //작업이 끝났을때
+		//	console.log(event,ui);
+		//},
+		update : (event, ui) => { //수정이 발생했을때
+			let depth = undefined;
+			event.target.childNodes.forEach((e,i)=>{
+				menuList.forEach(menuObj=>{
+					if(e.dataset.code == menuObj.code) {
+						menuObj.order = ++i;
+						depth = menuObj.depth;
+					}
+				});
+			});
+			orderChangeBool = true;
+			menuListSet(menuList, depth);
+			
+			alert("순서 변경이 발생하였습니다.\n저장을 하셔야 실제로 반영됩니다.");
+		}
+	});
+	$("#menuSortable").disableSelection();
+	
+	var data = {
+		grpCd		: "07"
+	}
+	
+	HIMA.hi2jv ("MAMC0010M10L", data, {success:function(data, header){
+		var usrTypCdList = data.businessData ;
+		
+		fnMakeComCd('selectMenuDenyCat', usrTypCdList);
+		fnMakeComCd('addMenuDenyCat', usrTypCdList);
+		
+	}, failure:function(data, header){
+		console.log(header);
+	}} );
+});
+
+function menuListSet(menu, depth) {
+	if(menu && Array.isArray(menu)) {
+		newMenuList = [];
+		menu.sort(function(a,b) {
+			if(a.depth > b.depth) return 1;
+			if(a.depth < b.depth) return -1;
+			return 0;
+		});
+		//depth별 메뉴배열 구조 변경
+		menu.forEach((e,i)=>{
+			if(newMenuList.length == 0) {
+				newMenuList[0] = new Array();
+				newMenuList[0].push(e);
+			}
+			else {
+				if(newMenuList.length > e.depth-1) {
+					if(e.depth == newMenuList[e.depth-1][0].depth) {
+						newMenuList[e.depth-1].push(e);
+					}
+				}
+				else {
+					newMenuList[e.depth-1] = new Array();
+					newMenuList[e.depth-1].push(e);
+				}
+			}
+		});
+		newMenuList.forEach(e=>{
+			e.sort(function(a,b) {
+				if(a.order > b.order) return 1;
+				if(a.order < b.order) return -1;
+				return 0;
+			});
+		});
+ 
+		menuListScreenSet(depth == undefined ? 0 : depth-1);
+	}
+}
+
+//화면에 뿌려지는 메뉴 세팅 함수
+function menuListScreenSet(depth, obj) {
+	let code = (obj == undefined) ? obj : obj.value;
+	//orderList 표시영역 초기화
+	$("#menuSortable").html("");
+	
+	//기존에 선택했던 영역이 있을 수 있으므로 전체 삭제 함.
+	let j = $("[id^=menuSel]").length;
+	for(let i=depth; i<j; i++) {
+		$("[id^=menuSel]").eq(depth).remove();
+	}
+	
+	if(newMenuList.length > depth) {
+		newMenuList[depth].forEach(e=>{
+			if(depth == 0) {
+				menuSelectCreate(e);
+			}
+			else if(code != '' && e.parent_code.toString().indexOf(code)>-1) {
+				menuSelectCreate(e);
+			}
+		});
+	}
+	
+	//순서 리스트 화면 표시
+	if($("#menuSortable")[0].childNodes.length == 0 && newMenuList.length > 0) {
+		newMenuList[depth-1].forEach(e=>{
+			if(depth > 1 && code == '') {
+				if(e.parent_code.toString().indexOf($("#menuSel"+(depth-2)).val())>-1) {
+					$("#menuSortable").append('<li data-code="'+e.code+'" data-order="'+e.order+'">'+e.name+'</li>');
+				}
+			}
+			else if(code != '' && e.parent_code.toString().indexOf(code)>-1) {
+				$("#menuSortable").append('<li data-code="'+e.code+'" data-order="'+e.order+'">'+e.name+'</li>');
+			}
+		});
+	}
+	
+	//메뉴 INPUT 데이터 세팅
+	if(depth > 1 && code == "") {
+		menuList.forEach(e=>{
+			if(e.code == obj.previousSibling.value) {
+				menuInputDataSet(e);
+			}
+		});
+	}
+	else if(code != undefined && code != "" && menuList.length > 0) {
+		menuList.forEach(e=>{
+			if(e.code == code) {
+				menuInputDataSet(e);
+			}
+		});
+	}
+	else {
+		menuInputDataSet(undefined);
+	}
+	
+	if(orderChangeBool) {
+		orderChangeBool = false;
+		if(depth > 0) {
+			$("#menuSel"+(depth-1)).change();
+		}
+	}
+	
+	function menuInputDataSet(e) {
+		menuSelectObj = e;
+		if(e) {			
+			$("#selectMenuCd").val(e.code);
+			$("#selectMenuNm").val(e.name);
+			$("#selectMenuDeny").val(e.deny);
+			$("#selectMenuUseBool").val(e.use_yn);
+			$("#selectMenuLink").val(e.link);
+			menuMoveOptionSet(e);
+		}
+		else {
+			$("#selectMenuCd").val("");
+			$("#selectMenuNm").val("");
+			$("#selectMenuDeny").val("");
+			$("#selectMenuUseBool").val("");
+			$("#selectMenuLink").val("");
+			menuMoveOptionSet();
+		}
+		$("#selectMenuDenyCat").val("");
+	}
+	
+	function menuSelectCreate(e) {
+		if($("#menuSel"+depth).length == 0) {
+			$("#menuNmDiv").append('<select id="menuSel'+depth+'" onchange="menuListScreenSet('+(depth+1)+',this)"></select>');
+			$("#menuSel"+depth).append('<option value="">선택</option>');
+		}
+		$("#menuSel"+depth).append('<option value="'+e.code+'">'+e.name+'</option>');
+		
+		//순서 리스트 화면 표시
+		$("#menuSortable").append('<li data-code="'+e.code+'" data-order="'+e.order+'">'+e.name+'</li>');
+	}
+	
+	function menuMoveOptionSet(sel_obj) {
+		let options = $("#selectMenuMoveCd option");
+		let j = options.length;
+		if(j > 1) {
+			options.each((i,e)=>{
+				if(i>0) e.remove();
+			});
+		}
+		if(sel_obj != undefined) {
+			if(sel_obj.parent_code != "0")
+				$("#selectMenuMoveCd").append('<option value="1|0">최상위</option>');
+			
+			//부모인경우 안나오게 하기 위한 마지막 부모값 추출
+			let lastParentCd = sel_obj.parent_code.toString().split("-")[sel_obj.parent_code.toString().split("-").length-1];
+			childCd = [];
+			menuList.forEach(e=>{
+				if(e.code != sel_obj.code) {
+					if(e.parent_code.toString().indexOf(sel_obj.code)<0) {	//자식이 아닌 경우
+						if(lastParentCd != e.code) { //부모가 아닌 경우
+							let parentStr = '';
+							
+							if(e.parent_code.toString().trim() == '' || e.parent_code.toString() == "0") {
+								parentStr = e.code;
+							}
+							else {
+								parentStr = e.parent_code.toString() + '-' + e.code;
+							}
+							
+							$("#selectMenuMoveCd").append('<option value="'+(e.depth+1)+'|'+ parentStr +'">'+e.name+'</option>');
+						}
+					}
+					else { //자식인 경우
+						childCd.push(e.code);
+					}
+				}
+			});
+			
+			childCd.forEach(code=>{
+				$("#selectMenuMoveCd option").each((i,e) => {
+					if(e.value.split("|").length > 1) {
+						if(e.value.split("|")[1].indexOf(code) > -1) {
+							e.remove();
+						}
+					}
+				});
+			});
+		}
+	}
+}
+
+
+function menuSave() {
+	let data = {
+			menu : menuList
+	}
+	HIMA.hi2jv("MAMB0070M01U",	{menuJson:JSON.stringify(data)}, {
+		success:function(data, header){
+			alert("저장 되었습니다.");
+			location.reload();
+		}, failure:function(data, header){
+			alert("저장에 실패했습니다.");
+		}
+	});
+}
+
+function menuDel() {
+	if(menuSelectObj) {
+		let childBoolMsg = menuList.some(e=>{ if(e.parent_code.toString().indexOf(menuSelectObj.code) > -1) return true; }) ? "서브메뉴가 존재합니다. 같이 삭제됩니다.\n" : ""; 
+		
+		if(confirm(childBoolMsg +"[" + menuSelectObj.name + "] 메뉴를 삭제 하시겠습니까?\n저장까지 하셔야 실제로 삭제가 됩니다.")) {
+			let menuSelNum = undefined;
+			let nextBool = false;
+			do {
+				nextBool = newMenuList.some((e,i)=>{
+					if(e.length > 0) {
+						return e.some((ele,idx)=>{
+							if(ele.code == menuSelectObj.code) {
+								e.splice(idx,1);
+								menuSelNum = i;
+								return true;
+							}
+							
+							if(ele.parent_code.toString().indexOf(menuSelectObj.code)>-1) {
+								e.splice(idx,1);
+								return true;
+							}
+						});
+					}
+					else {
+						newMenuList.splice(i,1);
+						return true;
+					}
+				});
+
+				nextBool = menuList.some((e,i)=>{
+					if(e.code == menuSelectObj.code) {
+						menuList.splice(i,1);
+						return true;
+					}
+					
+					if(e.parent_code.toString().indexOf(menuSelectObj.code)>-1) {
+						menuList.splice(i,1);
+						return true;
+					}
+				});
+			}
+			while(nextBool)
+			
+			if(menuSelNum != undefined) {
+				orderChangeBool = true;
+				menuListScreenSet(menuSelNum);
+			}
+			
+		}
+	}
+	else {
+		alert("선택된 메뉴가 없습니다.");
+	}
+}
+
+function addDepthScreenSet(depth, code) {
+	let j = $("[id^=addMenuDepthSel]").length;
+	for(let i=depth; i<j; i++) {
+		$("[id^=addMenuDepthSel]").eq(depth).remove();
+	}
+	
+	if(newMenuList.length > depth) {
+		newMenuList[depth].forEach(e=>{
+			if(depth == 0) {
+				createAddMenuDepthDiv(e);
+			}
+			else if(code != undefined && e.parent_code.toString().indexOf(code.value)>-1) {
+				createAddMenuDepthDiv(e);
+			}
+		});
+	}
+	
+	function createAddMenuDepthDiv(e) {
+		if($("#addMenuDepthSel"+depth).length == 0) {
+			$("#addMenuDepthDiv").append('<select id="addMenuDepthSel'+depth+'" onchange="addDepthScreenSet('+(depth+1)+',this)"></select>');
+			let msg = depth == 0 ? "메인" : "선택";
+			$("#addMenuDepthSel"+depth).append('<option value="0">'+ msg +'</option>');
+		}
+		$("#addMenuDepthSel"+depth).append('<option value="'+e.code+'">'+e.name+'</option>');
+	}
+}
+
+function menuAdd() {
+	$("#addLayer input").each((i,e)=>{e.value = '';});
+	$("#addLayer select").each((i,e)=>{e.value = 'N';});
+	$("#addMenuDepthDiv").html("");
+	$("#addMenuDenyCat").val("");
+	addDepthScreenSet(0);
+	$("#addLayer").show();
+}
+
+function menuAddSet() {
+	let code = 0;
+	let depth = $("[id^=addMenuDepthSel]").length;
+	let parent_code = "0";
+	
+	if(depth > 0) {
+		for(let i=0; i<depth; i++) {
+			if(i==0)
+				parent_code = $("#addMenuDepthSel"+i).val();
+			else if($("#addMenuDepthSel"+i).val() != "0")
+				parent_code = parent_code + "-" + $("#addMenuDepthSel"+i).val();
+		}
+	}
+	
+	menuList.forEach(e=>{
+		if(code < e.code) {
+			code = e.code //제일 마지막 코드로 채번
+		}
+	});
+	
+	let addData = {
+		code: code+1,
+		deny: $("#addMenuDeny").val(),
+		depth: parent_code == "0" ? depth : parent_code.split("-").length+1,
+		link: $("#addMenuLink").val(),
+		name: $("#addMenuName").val(),
+		order: 1,
+		parent_code: parent_code,
+		use_yn: $("#addMenuUseYn").val()
+	}
+	
+	if(newMenuList.length >= addData.depth) {
+		let lastCd  = parent_code.toString().split("-")[parent_code.toString().split("-").length-1];
+		let eleLastCd = "";
+		newMenuList[addData.depth-1].forEach(ele=>{
+			eleLastCd = ele.parent_code.toString().split("-")[ele.parent_code.toString().split("-").length-1];
+			if(eleLastCd == lastCd) {
+				addData.order = ele.order+1;
+			}
+		})
+	}
+	
+	menuList.push(addData);
+	menuListSet(menuList);
+	alert("추가되었습니다.\n저장하셔야 실제로 반영됩니다.");
+	$("#addLayer .btn-layer-close").eq(0).click();
+}
+
+function menuUpdate() {
+	if($("#selectMenuCd").val() == "") {
+		alert("수정할 데이터가 존재하지 않습니다.");
+	}
+	else {
+		let nextBool = false;
+		let parent_cd = "";
+		let child_depth = 0;
+		let sel_depth = 0;
+		
+		menuList.forEach(e=>{
+			if(e.code == $("#selectMenuCd").val()) {
+				e.name = $("#selectMenuNm").val();
+				e.deny = $("#selectMenuDeny").val();
+				e.use_yn = $("#selectMenuUseBool").val();
+				e.link = $("#selectMenuLink").val();
+				if($("#selectMenuMoveCd").val() != "") {
+					sel_depth = parseInt(e.depth) + 1;
+					e.depth = parseInt($("#selectMenuMoveCd").val().split('|')[0]);
+					e.parent_code = $("#selectMenuMoveCd").val().split('|')[1];
+					parent_cd = (e.parent_code == "0" ? "" : (e.parent_code + "-")) + e.code;
+					child_depth = e.depth;
+					nextBool = true;
+					
+					if(newMenuList.length >= e.depth) {
+						let lastCd  = e.parent_code.toString().split("-")[e.parent_code.toString().split("-").length-1];
+						let eleLastCd = "";
+						newMenuList[e.depth-1].forEach(ele=>{
+							eleLastCd = ele.parent_code.toString().split("-")[ele.parent_code.toString().split("-").length-1];
+							if(eleLastCd == lastCd) {
+								e.order = ele.order+1;
+							}
+						})
+					}
+				}
+			}
+		});
+		
+		//자식관련 재설정 작업
+		let childCdlist = new Array();
+		let childData = undefined;
+		let childCd = undefined;
+		let lastParentCd = "";
+		while(nextBool) {
+			childCd = undefined;
+			lastParentCd = parent_cd.split("-")[parent_cd.split("-").length-1];
+			
+			menuList.forEach(e=>{
+				childData = undefined;
+				if(e.depth == sel_depth && e.parent_code.toString().indexOf(lastParentCd)>-1) {
+					e.depth = child_depth+1;
+					e.parent_code = parent_cd;
+					childData = {
+							parent_code : e.parent_code + "-" + e.code,
+							depth : e.depth,
+							sel_depth : sel_depth+1
+					}
+					childCdlist.push(childData);
+				}
+			});
+			
+			if(childCdlist.length > 0) {
+				childCd = childCdlist.shift();
+				parent_cd = childCd.parent_code;
+				child_depth = childCd.depth;
+				sel_depth = childCd.sel_depth;
+			}
+			else {
+				nextBool = false;
+			}
+		}
+		
+		
+		menuListSet(menuList);
+		alert("수정되었습니다.\n저장하셔야 실제로 반영됩니다.");
+	}
+}
+
+function menuDenyAdd() {
+	if(menuSelectObj != undefined) {
+		if($("#selectMenuDenyCat").val() != "") {
+			let selectMenuDeny = $("#selectMenuDeny");
+			if(selectMenuDeny.val().trim() == "") {
+				selectMenuDeny.val($("#selectMenuDenyCat").val());
+			}
+			else {
+				if(selectMenuDeny.val().indexOf($("#selectMenuDenyCat").val()) < 0) 
+					selectMenuDeny.val(selectMenuDeny.val() + "," +$("#selectMenuDenyCat").val());
+				else
+					alert("이미 추가된 데이터입니다.");
+			}
+		}
+		else {
+			alert("추가할 데이터를 선택 해주세요.");
+		}
+	}
+	else {
+		alert("수정 추가할 데이터가 존재하지 않습니다.");
+	}	
+}
+
+function addMenuDenyAdd() {
+	if($("#addMenuDenyCat").val() != "") {
+		let addMenuDeny = $("#addMenuDeny");
+		if(addMenuDeny.val().trim() == "") {
+			addMenuDeny.val($("#addMenuDenyCat").val());
+		}
+		else {
+			if(addMenuDeny.val().indexOf($("#addMenuDenyCat").val()) < 0) 
+				addMenuDeny.val(addMenuDeny.val() + "," +$("#addMenuDenyCat").val());
+			else
+				alert("이미 추가된 데이터입니다.");
+		}
+	}
+	else {
+		alert("추가할 데이터를 선택 해주세요.");
+	}
+}
+</script>
+</head>
+<body>
+
+<!-- 등록 팝업 -->
+<div class="layer" id="addLayer" style="top:20%; left:35%;">
+	<h3 class="layer-tit"><span id="addPopupTitle">등록</span></h3>
+	<div class="layer-content">
+		<div class="dl-list">
+			<dl>
+				<dt>메뉴명</dt>
+				<dd><input type="text" id="addMenuName" name="addMenuName" /></dd>
+				<dt>권한</dt>
+				<dd>
+					<select id="addMenuDenyCat"><option value="">선택</option></select>
+					<button type="button" class="btn" id="addMenuDenyAddBtn" onclick="addMenuDenyAdd()">추가</button>
+					<input type="text" id="addMenuDeny" name="addMenuDeny" />
+				</dd>
+				<dt>사용여부</dt>
+				<dd>
+					<select id="addMenuUseYn" name="addMenuUseYn" >
+						<option value="Y">Y</option>
+						<option value="N" selected>N</option>
+					</select>
+				</dd>
+				<dt>링크</dt>
+				<dd><input type="text" id="addMenuLink" name="addMenuLink" /></dd>
+				<dt>위치</dt>
+				<dd><div id="addMenuDepthDiv"></div></dd>
+			</dl>
+			<div class="btn-wrap">
+				<button type="button" class="btn" id="menuAddSetBtn" onclick="menuAddSet()">등록</button>
+			</div>
+		</div>
+	</div>
+	<button class="btn-layer-close">닫기</button>
+</div>
+
+<!-- #wrap -->
+<div id="wrap">
+	<!-- #container -->
+	<div id="container">
+
+		<%@ include file='/WEB-INF/jsp/layout/hdmf_layout.jsp'%>
+
+		<div class="contents">
+			<div class="cont-inner">
+				
+				<!-- 조회 조건 -->
+				<div class="inner">
+					<div>메뉴선택</div>
+					<div id="menuNmDiv">
+					</div>
+					<div id="menuInfoDiv">
+						<input type="hidden" id="selectMenuCd" name="selectMenuCd" value="" />
+						<dl>
+							<dt>메뉴명</dt>
+							<dd><input type="text" id="selectMenuNm" name="selectMenuNm" /></dd>
+							<dt>권한</dt>
+							<dd>
+								<select id="selectMenuDenyCat"><option value="">선택</option></select>
+								<button type="button" class="btn" id="menuDenyAddBtn" onclick="menuDenyAdd()">추가</button>
+								<input type="text" id="selectMenuDeny" name="selectMenuDeny" />
+							</dd>
+							<dt>사용여부</dt>
+							<dd>
+								<select id="selectMenuUseBool" name="selectMenuUseBool" >
+									<option value="">선택</option>
+									<option value="Y">Y</option>
+									<option value="N">N</option>
+								</select>
+							</dd>
+							<dt>링크</dt>
+							<dd><input type="text" id="selectMenuLink" name="selectMenuLink" /></dd>
+							<dt>이동 할 메뉴 선택</dt>
+							<dd>
+								<select id="selectMenuMoveCd" >
+									<option value="">선택</option>
+								</select>
+							</dd>
+						</dl>
+					</div>
+					<!-- 조회 버튼 -->
+					<div class="btn-wrap">
+						<button type="button" class="btn" id="menuSaveBtn" onclick="menuSave()">저장</button>
+						<button type="button" class="btn" id="menuUpdateBtn" onclick="menuUpdate()">수정</button>
+						<button type="button" class="btn" id="menuAddBtn" onclick="menuAdd()" rel="addLayer">추가</button>
+						<button type="button" class="btn" id="menuDelBtn" onclick="menuDel()">삭제</button>
+					</div>
+				</div>
+				
+				<div class="inner">
+					<ul id="menuSortable">
+					</ul>
+				</div>
+				
+			</div>
+		</div>
+		<!-- // contents -->
+		
+	</div>
+	<!-- // #container -->
+</div>
+<!-- // #wrap -->
+</body>
+</html>
