@@ -5,17 +5,14 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no">
 <title>메뉴관리</title>
 
-<style type="text/css">
-	tr.bg_over:hover {background:#F5F5F5; cursor:pointer;}
-</style>
-
 <script type="text/javascript">
 var menuList = undefined; //실 메뉴
 var newMenuList = new Array(); //메뉴 order관련 재정의
 var menuSelectObj = undefined; //선택된 메뉴
 var orderChangeBool = false;
 $(document).ready(function() {
-	//[{"deny":"CD0701,CD0705","code":1,"depth":1,"use_yn":"Y","name":"water","link":"water.com","parent_code":0,"order":2},{"deny":"CD0701","code":2,"depth":1,"use_yn":"Y","name":"coffee","link":"coffee.com","parent_code":0,"order":1},{"deny":"","code":3,"depth":1,"use_yn":"Y","name":"cookie","link":"cookie.com","parent_code":0,"order":3},{"deny":"","code":5,"depth":2,"use_yn":"Y","name":"americano","link":"americano.com","parent_code":2,"order":2},{"deny":"","code":4,"depth":2,"use_yn":"Y","name":"cafelatte","link":"cafelatte.com","parent_code":2,"order":1},{"deny":"CD0704","code":6,"depth":3,"use_yn":"Y","name":"latte","link":"latte.com","parent_code":4,"order":1}];
+	//[{"deny":"","code":1,"depth":1,"use_yn":"Y","link":"","name":"고객","parent_code":"0","screen_use_yn":"Y","order":1},{"deny":"","code":4,"depth":1,"use_yn":"Y","link":"","name":"장기","parent_code":"0","screen_use_yn":"Y","order":2},{"deny":"","code":11,"depth":1,"use_yn":"Y","link":"","name":"자동차","parent_code":"0","screen_use_yn":"Y","order":3},{"deny":"","code":15,"depth":1,"use_yn":"Y","link":"","name":"심사업무조회","parent_code":"0","screen_use_yn":"Y","order":4},{"deny":"","code":17,"depth":1,"use_yn":"Y","link":"","name":"보상","parent_code":"0","screen_use_yn":"Y","order":5},{"deny":"","code":22,"depth":1,"use_yn":"Y","link":"","name":"보험료수납","parent_code":"0","screen_use_yn":"Y","order":6},{"deny":"","code":30,"depth":1,"use_yn":"Y","link":"","name":"증명서발송","parent_code":"0","screen_use_yn":"Y","order":7},{"deny":"","code":32,"depth":1,"use_yn":"Y","link":"","name":"행복보장분석","parent_code":"0","screen_use_yn":"Y","order":8},{"deny":"","code":34,"depth":1,"use_yn":"Y","link":"","name":"사진등록","parent_code":"0","screen_use_yn":"Y","order":9},{"deny":"","code":37,"depth":1,"use_yn":"Y","link":"","name":"M소식지/교육","parent_code":"0","screen_use_yn":"Y","order":10},{"deny":"","code":40,"depth":1,"use_yn":"Y","link":"","name":"활동관리","parent_code":"0","screen_use_yn":"Y","order":11},{"deny":"","code":43,"depth":1,"use_yn":"Y","link":"","name":"도입활동","parent_code":"0","screen_use_yn":"Y","order":12},{"deny":"","code":2,"depth":2,"use_yn":"Y","link":"/bin/CI/MOCI001010G.jsp","name":"고객등록조회","parent_code":"1","screen_use_yn":"Y","order":1},{"deny":"","code":3,"depth":2,"use_yn":"Y","link":"/bin/CI/MOCI003010G.jsp","name":"가입설계동의","parent_code":"1","screen_use_yn":"Y","order":1},{"deny":"","code":5,"depth":2,"use_yn":"Y","link":"/bin/LT/MOLT003010G.jsp","name":"설계조회","parent_code":"4","screen_use_yn":"Y","order":1},{"deny":"","code":6,"depth":2,"use_yn":"Y","link":"/bin/LT/MOLT004010G.jsp","name":"계약조회","parent_code":"4","screen_use_yn":"Y","order":1},{"deny":"","code":7,"depth":2,"use_yn":"Y","link":"/bin/LT/MOLT002010G.jsp","name":"집금책임계약","parent_code":"4","screen_use_yn":"Y","order":1},{"deny":"","code":8,"depth":2,"use_yn":"Y","link":"/bin/LT/MOLT005010G.jsp","name":"실손정액담보조회","parent_code":"4","screen_use_yn":"Y","order":1},{"deny":"","code":9,"depth":2,"use_yn":"Y","link":"/bin/LT/MOLT003040G.jsp","name":"모집자전자서명","parent_code":"4","screen_use_yn":"Y","order":1},{"deny":"","code":10,"depth":2,"use_yn":"Y","link":"/bin/LT/MOLT007010G.jsp","name":"Hi심사톡","parent_code":"4","screen_use_yn":"Y","order":1},{"deny":"","code":12,"depth":2,"use_yn":"Y","link":"/bin/LT/MOLT003010G.jsp?flag=car","name":"설계조회","parent_code":"11","screen_use_yn":"Y","order":1},{"deny":"","code":13,"depth":2,"use_yn":"Y","link":"/bin/LT/MOLT004010G.jsp?flag=car","name":"계약조회","parent_code":"11","screen_use_yn":"Y","order":1},{"deny":"","code":14,"depth":2,"use_yn":"Y","link":"/bin/MT/MOMT003010G.jsp","name":"단기운전자배서","parent_code":"11","screen_use_yn":"Y","order":1},{"deny":"","code":16,"depth":2,"use_yn":"Y","link":"/bin/ZZ/MOZZ001010G.jsp","name":"심사업무조회","parent_code":"15","screen_use_yn":"Y","order":1},{"deny":"","code":18,"depth":2,"use_yn":"Y","link":"/bin/CF/MOCF001001G.jsp","name":"장기사고접수(질병,상해)","parent_code":"17","screen_use_yn":"Y","order":1},{"deny":"","code":19,"depth":2,"use_yn":"Y","link":"/bin/CF/MOCF002001G.jsp","name":"보상진행현황조회","parent_code":"17","screen_use_yn":"Y","order":1},{"deny":"","code":20,"depth":2,"use_yn":"Y","link":"/bin/CL/MOCL001010G.jsp","name":"구비서류안내","parent_code":"17","screen_use_yn":"Y","order":1},{"deny":"","code":21,"depth":2,"use_yn":"Y","link":"/bin/CL/MOCL002010G.jsp","name":"간편접수URL문자발송","parent_code":"17","screen_use_yn":"Y","order":1},{"deny":"","code":23,"depth":2,"use_yn":"Y","link":"","name":"가상계좌","parent_code":"22","screen_use_yn":"Y","order":1},{"deny":"","code":26,"depth":2,"use_yn":"Y","link":"","name":"신용카드","parent_code":"22","screen_use_yn":"Y","order":2},{"deny":"","code":29,"depth":2,"use_yn":"Y","link":"","name":"장기계속분 즉시이체","parent_code":"22","screen_use_yn":"Y","order":3},{"deny":"","code":31,"depth":2,"use_yn":"Y","link":"","name":"증권및약관발송","parent_code":"30","screen_use_yn":"Y","order":1},{"deny":"","code":33,"depth":2,"use_yn":"Y","link":"","name":"행복보장분석","parent_code":"32","screen_use_yn":"Y","order":1},{"deny":"","code":35,"depth":2,"use_yn":"Y","link":"","name":"장기사진등록","parent_code":"34","screen_use_yn":"Y","order":1},{"deny":"","code":36,"depth":2,"use_yn":"Y","link":"","name":"자동차사진등록","parent_code":"34","screen_use_yn":"Y","order":2},{"deny":"","code":38,"depth":2,"use_yn":"Y","link":"/bin/NS/MONS001001G.jsp","name":"M소식지","parent_code":"37","screen_use_yn":"Y","order":1},{"deny":"","code":39,"depth":2,"use_yn":"Y","link":"MobiApp.openHihrd()","name":"스마트연수원 바로가기","parent_code":"37","screen_use_yn":"Y","order":2},{"deny":"","code":41,"depth":2,"use_yn":"Y","link":"","name":"CRM플래너 활동","parent_code":"40","screen_use_yn":"Y","order":1},{"deny":"","code":42,"depth":2,"use_yn":"Y","link":"","name":"TC영업활동","parent_code":"40","screen_use_yn":"Y","order":2},{"deny":"","code":44,"depth":2,"use_yn":"Y","link":"","name":"간편배양등록","parent_code":"43","screen_use_yn":"Y","order":1},{"deny":"","code":24,"depth":3,"use_yn":"Y","link":"","name":"가상계좌 부여 및 조회","parent_code":"22-23","screen_use_yn":"Y","order":1},{"deny":"","code":25,"depth":3,"use_yn":"Y","link":"","name":"가상계좌 입금 조회","parent_code":"22-23","screen_use_yn":"Y","order":1},{"deny":"","code":27,"depth":3,"use_yn":"Y","link":"","name":"신용카드 승인","parent_code":"22-26","screen_use_yn":"Y","order":1},{"deny":"","code":28,"depth":3,"use_yn":"Y","link":"","name":"승인내역 조회","parent_code":"22-26","screen_use_yn":"Y","order":1}]
+
 	menuList = JSON.parse('${menu}');
 	menuListSet(menuList);
 	$("#menuSortable").sortable({
@@ -110,22 +107,39 @@ function menuListScreenSet(depth, obj) {
 			if(depth == 0) {
 				menuSelectCreate(e);
 			}
-			else if(code != '' && e.parent_code.toString().indexOf(code)>-1) {
-				menuSelectCreate(e);
+			else if(code != '') {
+				let parentCdArr = e.parent_code.split("-");
+				parentCdArr.some(parentCd => {
+					if(parentCd == code) {
+						menuSelectCreate(e);
+						return true;
+					}
+				});
 			}
 		});
 	}
 	
 	//순서 리스트 화면 표시
 	if($("#menuSortable")[0].childNodes.length == 0 && newMenuList.length > 0) {
+		let menuSelVal = $("#menuSel"+(depth-2)).val();
 		newMenuList[depth-1].forEach(e=>{
+			let parentCdArr = e.parent_code.split("-");
 			if(depth > 1 && code == '') {
-				if(e.parent_code.toString().indexOf($("#menuSel"+(depth-2)).val())>-1) {
-					$("#menuSortable").append('<li data-code="'+e.code+'" data-order="'+e.order+'">'+e.name+'</li>');
-				}
+				parentCdArr.some(parentCd => {
+					if(parentCd == menuSelVal) {
+						$("#menuSortable").append('<li data-code="'+e.code+'" data-order="'+e.order+'">'+e.name+'</li>');
+						return true;
+					}
+				});
 			}
-			else if(code != '' && e.parent_code.toString().indexOf(code)>-1) {
+			else if(depth == 1 && code == '') {
 				$("#menuSortable").append('<li data-code="'+e.code+'" data-order="'+e.order+'">'+e.name+'</li>');
+			}
+			else if(code != '') {
+				parentCdArr.forEach(parentCd => {
+					if(parentCd == code)
+						$("#menuSortable").append('<li data-code="'+e.code+'" data-order="'+e.order+'">'+e.name+'</li>');
+				});
 			}
 		});
 	}
@@ -162,7 +176,10 @@ function menuListScreenSet(depth, obj) {
 			$("#selectMenuCd").val(e.code);
 			$("#selectMenuNm").val(e.name);
 			$("#selectMenuDeny").val(e.deny);
-			$("#selectMenuUseBool").val(e.use_yn);
+			e.use_yn == 'Y' ? $("#selectMenuUseBoolY").click() : $("#selectMenuUseBoolN").click();
+			//$("#selectMenuUseBool").val(e.use_yn);
+			e.screen_use_yn == 'Y' ? $("#selectMenuScreenUseBoolY").click() : $("#selectMenuScreenUseBoolN").click();
+			//$("#selectMenuScreenUseBool").val(e.screen_use_yn);
 			$("#selectMenuLink").val(e.link);
 			menuMoveOptionSet(e);
 		}
@@ -170,7 +187,10 @@ function menuListScreenSet(depth, obj) {
 			$("#selectMenuCd").val("");
 			$("#selectMenuNm").val("");
 			$("#selectMenuDeny").val("");
-			$("#selectMenuUseBool").val("");
+			$("#selectMenuUseBoolN").click();
+			//$("#selectMenuUseBool").val("");
+			$("#selectMenuScreenUseBoolN").click();
+			//$("#selectMenuScreenUseBool").val("");
 			$("#selectMenuLink").val("");
 			menuMoveOptionSet();
 		}
@@ -205,18 +225,32 @@ function menuListScreenSet(depth, obj) {
 			childCd = [];
 			menuList.forEach(e=>{
 				if(e.code != sel_obj.code) {
-					if(e.parent_code.toString().indexOf(sel_obj.code)<0) {	//자식이 아닌 경우
+					let nextBool = true;
+					let parentCdArr = e.parent_code.split("-");
+					parentCdArr.forEach(parentCd => {
+						if(parentCd == sel_obj.code)
+							nextBool = false;
+					});
+					if(nextBool) {	//자식이 아닌 경우
 						if(lastParentCd != e.code) { //부모가 아닌 경우
 							let parentStr = '';
-							
+							let menuNm = '';
 							if(e.parent_code.toString().trim() == '' || e.parent_code.toString() == "0") {
 								parentStr = e.code;
 							}
 							else {
+								e.parent_code.toString().split('-').forEach(cd=>{
+									menuList.some(menu=>{
+										if(cd == menu.code) {
+											menuNm += '('+menu.name+')';
+											return true;
+										}
+									});
+								});
 								parentStr = e.parent_code.toString() + '-' + e.code;
 							}
 							
-							$("#selectMenuMoveCd").append('<option value="'+(e.depth+1)+'|'+ parentStr +'">'+e.name+'</option>');
+							$("#selectMenuMoveCd").append('<option value="'+(e.depth+1)+'|'+ parentStr +'">'+ menuNm + e.name+'</option>');
 						}
 					}
 					else { //자식인 경우
@@ -240,27 +274,54 @@ function menuListScreenSet(depth, obj) {
 
 
 function menuSave() {
-	let data = {
-			menu : menuList
+	if($("#selectMenuCd").val() != "") {
+		menuUpdate('save').then(bool=>{
+			let data = {
+					menu : menuList
+			}
+			HIMA.hi2jv("MAMB0070M01U",	{menuJson:JSON.stringify(data)}, {
+				success:function(data, header){
+					alert("저장 되었습니다.");
+					location.reload();
+				}, failure:function(data, header){
+					alert("저장에 실패했습니다.");
+				}
+			});
+		})
 	}
-	HIMA.hi2jv("MAMB0070M01U",	{menuJson:JSON.stringify(data)}, {
-		success:function(data, header){
-			alert("저장 되었습니다.");
-			location.reload();
-		}, failure:function(data, header){
-			alert("저장에 실패했습니다.");
-		}
-	});
 }
 
 function menuDel() {
 	if(menuSelectObj) {
-		let childBoolMsg = menuList.some(e=>{ if(e.parent_code.toString().indexOf(menuSelectObj.code) > -1) return true; }) ? "서브메뉴가 존재합니다. 같이 삭제됩니다.\n" : ""; 
+		let childBoolMsg = menuList.some(e=>{
+			let parentCdArr = e.parent_code.split("-");
+			return parentCdArr.some(parentCd => {
+				if(parentCd == menuSelectObj.code)
+					return true;
+			});
+		}) ? "서브메뉴가 존재합니다. 같이 삭제됩니다.\n" : ""; 
 		
 		if(confirm(childBoolMsg +"[" + menuSelectObj.name + "] 메뉴를 삭제 하시겠습니까?\n저장까지 하셔야 실제로 삭제가 됩니다.")) {
 			let menuSelNum = undefined;
 			let nextBool = false;
+			let childCodeList = [];
+			//삭제시 부모코드 형식변경전에 대한 자식들 삭제가 안됌.
 			do {
+				nextBool = menuList.some((e,i)=>{
+					if(e.code == menuSelectObj.code) {
+						menuList.splice(i,1);
+						return true;
+					}
+					
+					let parentCdArr = e.parent_code.split("-");
+					return parentCdArr.some(parentCd => {
+						if(parentCd == menuSelectObj.code) {
+							menuList.splice(i,1);
+							return true;
+						}
+					});
+				});
+				
 				nextBool = newMenuList.some((e,i)=>{
 					if(e.length > 0) {
 						return e.some((ele,idx)=>{
@@ -270,26 +331,17 @@ function menuDel() {
 								return true;
 							}
 							
-							if(ele.parent_code.toString().indexOf(menuSelectObj.code)>-1) {
-								e.splice(idx,1);
-								return true;
-							}
+							let parentCdArr = e.parent_code.split("-");
+							return parentCdArr.some(parentCd => {
+								if(parentCd == menuSelectObj.code) {
+									e.splice(idx,1);
+									return true;
+								}
+							});
 						});
 					}
 					else {
 						newMenuList.splice(i,1);
-						return true;
-					}
-				});
-
-				nextBool = menuList.some((e,i)=>{
-					if(e.code == menuSelectObj.code) {
-						menuList.splice(i,1);
-						return true;
-					}
-					
-					if(e.parent_code.toString().indexOf(menuSelectObj.code)>-1) {
-						menuList.splice(i,1);
 						return true;
 					}
 				});
@@ -319,8 +371,14 @@ function addDepthScreenSet(depth, code) {
 			if(depth == 0) {
 				createAddMenuDepthDiv(e);
 			}
-			else if(code != undefined && e.parent_code.toString().indexOf(code.value)>-1) {
-				createAddMenuDepthDiv(e);
+			else if(code != undefined) {
+				let parentCdArr = e.parent_code.split("-");
+				parentCdArr.some(parentCd => {
+					if(parentCd == code.value) {
+						createAddMenuDepthDiv(e);
+						return true;
+					}
+				});
 			}
 		});
 	}
@@ -336,138 +394,174 @@ function addDepthScreenSet(depth, code) {
 }
 
 function menuAdd() {
-	$("#addLayer input").each((i,e)=>{e.value = '';});
-	$("#addLayer select").each((i,e)=>{e.value = 'N';});
+	$("#addLayer input").each((i,e)=>{ if(e.type=='text') e.value = ''; });
+	$("#addLayer select").each((i,e)=>{ e.value = 'N'; });
 	$("#addMenuDepthDiv").html("");
 	$("#addMenuDenyCat").val("");
+	$("#addMenuUseBoolY").click();
+	$("#addMenuScreenUseBoolY").click();
 	addDepthScreenSet(0);
 	$("#addLayer").show();
 }
 
 function menuAddSet() {
-	let code = 0;
-	let depth = $("[id^=addMenuDepthSel]").length;
-	let parent_code = "0";
-	
-	if(depth > 0) {
-		for(let i=0; i<depth; i++) {
-			if(i==0)
-				parent_code = $("#addMenuDepthSel"+i).val();
-			else if($("#addMenuDepthSel"+i).val() != "0")
-				parent_code = parent_code + "-" + $("#addMenuDepthSel"+i).val();
-		}
-	}
-	
-	menuList.forEach(e=>{
-		if(code < e.code) {
-			code = e.code //제일 마지막 코드로 채번
-		}
-	});
-	
-	let addData = {
-		code: code+1,
-		deny: $("#addMenuDeny").val(),
-		depth: parent_code == "0" ? depth : parent_code.split("-").length+1,
-		link: $("#addMenuLink").val(),
-		name: $("#addMenuName").val(),
-		order: 1,
-		parent_code: parent_code,
-		use_yn: $("#addMenuUseYn").val()
-	}
-	
-	if(newMenuList.length >= addData.depth) {
-		let lastCd  = parent_code.toString().split("-")[parent_code.toString().split("-").length-1];
-		let eleLastCd = "";
-		newMenuList[addData.depth-1].forEach(ele=>{
-			eleLastCd = ele.parent_code.toString().split("-")[ele.parent_code.toString().split("-").length-1];
-			if(eleLastCd == lastCd) {
-				addData.order = ele.order+1;
-			}
-		})
-	}
-	
-	menuList.push(addData);
-	menuListSet(menuList);
-	alert("추가되었습니다.\n저장하셔야 실제로 반영됩니다.");
-	$("#addLayer .btn-layer-close").eq(0).click();
-}
-
-function menuUpdate() {
-	if($("#selectMenuCd").val() == "") {
-		alert("수정할 데이터가 존재하지 않습니다.");
+	if($("#addMenuName").val().trim() == "") {
+		alert("메뉴명은 필수 입력 입니다.");	
 	}
 	else {
-		let nextBool = false;
-		let parent_cd = "";
-		let child_depth = 0;
-		let sel_depth = 0;
+		let code = 0;
+		let depth = $("[id^=addMenuDepthSel]").length == 0 ? 1 : $("[id^=addMenuDepthSel]").length;
+		let parent_code = "0";
+		
+		if($("[id^=addMenuDepthSel]").length > 0) {
+			for(let i=0; i<depth; i++) {
+				if(i==0)
+					parent_code = $("#addMenuDepthSel"+i).val();
+				else if($("#addMenuDepthSel"+i).val() != "0")
+					parent_code = parent_code + "-" + $("#addMenuDepthSel"+i).val();
+			}
+		}
 		
 		menuList.forEach(e=>{
-			if(e.code == $("#selectMenuCd").val()) {
-				e.name = $("#selectMenuNm").val();
-				e.deny = $("#selectMenuDeny").val();
-				e.use_yn = $("#selectMenuUseBool").val();
-				e.link = $("#selectMenuLink").val();
-				if($("#selectMenuMoveCd").val() != "") {
-					sel_depth = parseInt(e.depth) + 1;
-					e.depth = parseInt($("#selectMenuMoveCd").val().split('|')[0]);
-					e.parent_code = $("#selectMenuMoveCd").val().split('|')[1];
-					parent_cd = (e.parent_code == "0" ? "" : (e.parent_code + "-")) + e.code;
-					child_depth = e.depth;
-					nextBool = true;
-					
-					if(newMenuList.length >= e.depth) {
-						let lastCd  = e.parent_code.toString().split("-")[e.parent_code.toString().split("-").length-1];
-						let eleLastCd = "";
-						newMenuList[e.depth-1].forEach(ele=>{
-							eleLastCd = ele.parent_code.toString().split("-")[ele.parent_code.toString().split("-").length-1];
-							if(eleLastCd == lastCd) {
-								e.order = ele.order+1;
-							}
-						})
-					}
-				}
+			if(code < e.code) {
+				code = e.code //제일 마지막 코드로 채번
 			}
 		});
 		
-		//자식관련 재설정 작업
-		let childCdlist = new Array();
-		let childData = undefined;
-		let childCd = undefined;
-		let lastParentCd = "";
-		while(nextBool) {
-			childCd = undefined;
-			lastParentCd = parent_cd.split("-")[parent_cd.split("-").length-1];
+		let addData = {
+			code: code+1,
+			deny: $("#addMenuDeny").val(),
+			depth: parent_code == "0" ? depth : parent_code.split("-").length+1,
+			link: $("#addMenuLink").val(),
+			name: $("#addMenuName").val(),
+			order: 1,
+			parent_code: parent_code,
+			use_yn: $("[name=addMenuUseBool]:checked").val(), //$("#addMenuUseYn").val(),
+			screen_use_yn: $("[name=addMenuScreenUseBool]:checked").val()	//$("#addMenuScreenUseYn").val()
+		}
+		
+		if(newMenuList.length > addData.depth) {
+			let lastCd  = parent_code.toString().split("-")[parent_code.toString().split("-").length-1];
+			let eleLastCd = "";
+			newMenuList[addData.depth-1].forEach(ele=>{
+				eleLastCd = ele.parent_code.toString().split("-")[ele.parent_code.toString().split("-").length-1];
+				if(eleLastCd == lastCd) {
+					addData.order = ele.order+1;
+				}
+			})
+		}
+		
+		menuList.push(addData);
+		menuListSet(menuList);
+		alert("추가 되었습니다.\n저장하셔야 실제로 반영됩니다.");
+		$("#addLayer .btn-layer-close").eq(0).click();
+	}
+}
+
+function menuUpdate(mode) {
+	return new Promise(function(resolve, reject) {
+		if($("#selectMenuCd").val() == "") {
+			alert("수정할 데이터가 존재하지 않습니다.");
+		}
+		else {
+			let nextBool = false;
+			let parent_cd = "";
+			let child_depth = 0;
+			let sel_depth = 0;
+			let reload = false;
 			
 			menuList.forEach(e=>{
-				childData = undefined;
-				if(e.depth == sel_depth && e.parent_code.toString().indexOf(lastParentCd)>-1) {
-					e.depth = child_depth+1;
-					e.parent_code = parent_cd;
-					childData = {
-							parent_code : e.parent_code + "-" + e.code,
-							depth : e.depth,
-							sel_depth : sel_depth+1
+				if(e.code == $("#selectMenuCd").val()) {
+					e.name = $("#selectMenuNm").val();
+					e.deny = $("#selectMenuDeny").val();
+					e.use_yn = $("[name=selectMenuUseBool]:checked").val();
+					e.screen_use_yn = $("[name=selectMenuScreenUseBool]:checked").val();
+					e.link = $("#selectMenuLink").val();
+					if($("#selectMenuMoveCd").val() != "") {
+						sel_depth = parseInt(e.depth) + 1;
+						e.depth = parseInt($("#selectMenuMoveCd").val().split('|')[0]);
+						e.parent_code = $("#selectMenuMoveCd").val().split('|')[1];
+						parent_cd = (e.parent_code == "0" ? "" : (e.parent_code + "-")) + e.code;
+						child_depth = e.depth;
+						nextBool = true;
+						reload = true;
+						
+						if(newMenuList.length >= e.depth) {
+							let lastCd  = e.parent_code.toString().split("-")[e.parent_code.toString().split("-").length-1];
+							let eleLastCd = "";
+							newMenuList[e.depth-1].forEach(ele=>{
+								eleLastCd = ele.parent_code.toString().split("-")[ele.parent_code.toString().split("-").length-1];
+								if(eleLastCd == lastCd) {
+									e.order = ele.order+1;
+								}
+							})
+						}
 					}
-					childCdlist.push(childData);
+					else {
+						newMenuList.some(newMenu=>{
+							if(newMenu.length > 0) {
+								return newMenu.some(obj=>{
+									if(obj.code == $("#selectMenuCd").val()) {
+										obj.name = $("#selectMenuNm").val();
+										obj.deny = $("#selectMenuDeny").val();
+										obj.use_yn = $("[name=selectMenuUseBool]:checked").val();
+										obj.screen_use_yn = $("[name=selectMenuScreenUseBool]:checked").val();
+										obj.link = $("#selectMenuLink").val();
+										return true;
+									}
+								}) 
+							} 
+						})
+					}
 				}
 			});
 			
-			if(childCdlist.length > 0) {
-				childCd = childCdlist.shift();
-				parent_cd = childCd.parent_code;
-				child_depth = childCd.depth;
-				sel_depth = childCd.sel_depth;
+			//자식관련 재설정 작업
+			let childCdlist = new Array();
+			let childData = undefined;
+			let childCd = undefined;
+			let lastParentCd = "";
+			while(nextBool) {
+				childCd = undefined;
+				lastParentCd = parent_cd.split("-")[parent_cd.split("-").length-1];
+				
+				menuList.forEach(e=>{
+					childData = undefined;
+					if(e.depth == sel_depth) {
+						let parentCdArr = e.parent_code.split("-");
+						parentCdArr.some(parentCd => {
+							if(parentCd == lastParentCd) {
+								e.depth = child_depth+1;
+								e.parent_code = parent_cd;
+								childData = {
+										parent_code : e.parent_code + "-" + e.code,
+										depth : e.depth,
+										sel_depth : sel_depth+1
+								}
+								childCdlist.push(childData);
+								return true;
+							}
+						});
+					}
+				});
+				
+				if(childCdlist.length > 0) {
+					childCd = childCdlist.shift();
+					parent_cd = childCd.parent_code;
+					child_depth = childCd.depth;
+					sel_depth = childCd.sel_depth;
+				}
+				else {
+					nextBool = false;
+				}
 			}
-			else {
-				nextBool = false;
-			}
+			
+			
+			if(reload) menuListSet(menuList);
+			if(mode != 'save') alert("수정되었습니다.\n저장하셔야 실제로 반영됩니다.");
 		}
-		
-		
-		menuListSet(menuList);
-		alert("수정되었습니다.\n저장하셔야 실제로 반영됩니다.");
-	}
+		resolve(true);
+	});
 }
 
 function menuDenyAdd() {
@@ -485,11 +579,41 @@ function menuDenyAdd() {
 			}
 		}
 		else {
-			alert("추가할 데이터를 선택 해주세요.");
+			alert("추가 할 데이터를 선택 해주세요.");
 		}
 	}
 	else {
-		alert("수정 추가할 데이터가 존재하지 않습니다.");
+		alert("수정 추가 할 데이터가 존재하지 않습니다.");
+	}	
+}
+
+function menuDenyDel() {
+	if(menuSelectObj != undefined) {
+		if($("#selectMenuDenyCat").val() != "") {
+			let selectMenuDeny = $("#selectMenuDeny");
+			let selectMenuDenyCat = $("#selectMenuDenyCat").val();
+			let str = '';
+			if(selectMenuDeny.val().trim() == "") {
+				alert("삭제 할 데이터가 존재하지 않습니다.");
+			}
+			else {
+				if(selectMenuDeny.val().indexOf(selectMenuDenyCat) > -1) {
+					selectMenuDeny.val().split(',').forEach(e => {
+						if(e != selectMenuDenyCat) str = str == '' ? e : str+','+e;  
+					});
+					selectMenuDeny.val(str);
+				}
+				else {
+					alert("이미 삭제된 데이터입니다.");
+				}
+			}
+		}
+		else {
+			alert("삭제 할 데이터를 선택 해주세요.");
+		}
+	}
+	else {
+		alert("수정 추가 할 데이터가 존재하지 않습니다.");
 	}	
 }
 
@@ -507,7 +631,7 @@ function addMenuDenyAdd() {
 		}
 	}
 	else {
-		alert("추가할 데이터를 선택 해주세요.");
+		alert("추가 할 데이터를 선택 해주세요.");
 	}
 }
 </script>
@@ -526,23 +650,34 @@ function addMenuDenyAdd() {
 				<dd>
 					<select id="addMenuDenyCat"><option value="">선택</option></select>
 					<button type="button" class="btn" id="addMenuDenyAddBtn" onclick="addMenuDenyAdd()">추가</button>
-					<input type="text" id="addMenuDeny" name="addMenuDeny" />
+					<input type="text" id="addMenuDeny" name="addMenuDeny" style="border:0px;padding:0px;" readOnly />
 				</dd>
 				<dt>사용여부</dt>
 				<dd>
-					<select id="addMenuUseYn" name="addMenuUseYn" >
+					<input type="radio" id="addMenuUseBoolY" name="addMenuUseBool" value="Y" checked/><label for="addMenuUseBoolY">예</label>
+					<input type="radio" id="addMenuUseBoolN" name="addMenuUseBool" value="N" /><label for="addMenuUseBoolN">아니요</label>
+					<!-- select id="addMenuUseYn" name="addMenuUseYn" >
 						<option value="Y">Y</option>
 						<option value="N" selected>N</option>
-					</select>
+					</select-->
+				</dd>
+				<dt>화면표시여부</dt>
+				<dd>
+					<input type="radio" id="addMenuScreenUseBoolY" name="addMenuScreenUseBool" value="Y" checked/><label for="addMenuScreenUseBoolY">예</label>
+					<input type="radio" id="addMenuScreenUseBoolN" name="addMenuScreenUseBool" value="N" /><label for="addMenuScreenUseBoolN">아니요</label>
+					<!-- select id="addMenuScreenUseYn" name="addMenuScreenUseYn" >
+						<option value="Y">Y</option>
+						<option value="N" selected>N</option>
+					</select-->
 				</dd>
 				<dt>링크</dt>
 				<dd><input type="text" id="addMenuLink" name="addMenuLink" /></dd>
 				<dt>위치</dt>
 				<dd><div id="addMenuDepthDiv"></div></dd>
 			</dl>
-			<div class="btn-wrap">
-				<button type="button" class="btn" id="menuAddSetBtn" onclick="menuAddSet()">등록</button>
-			</div>
+		</div>
+		<div class="btn-wrap">
+			<button type="button" class="btn" id="menuAddSetBtn" onclick="menuAddSet()">등록</button>
 		</div>
 	</div>
 	<button class="btn-layer-close">닫기</button>
@@ -560,50 +695,82 @@ function addMenuDenyAdd() {
 				
 				<!-- 조회 조건 -->
 				<div class="inner">
-					<div>메뉴선택</div>
-					<div id="menuNmDiv">
-					</div>
-					<div id="menuInfoDiv">
+					<div class="table-row">
+						<table>
+							<colgroup>
+								<col width="120px">
+								<col width="*">
+							</colgroup>
+							<tr>
+								<th>메뉴선택</th>
+								<td><div id="menuNmDiv"></div></td>
+							</tr>
+							<tr>
+								<th>메뉴명</th>
+								<td><input type="text" id="selectMenuNm" name="selectMenuNm" /></td>
+							</tr>
+							<tr>
+								<th>사용여부</th>
+								<td>
+									<input type="radio" id="selectMenuUseBoolY" name="selectMenuUseBool" value="Y"/><label for="selectMenuUseBoolY">예</label>
+									<input type="radio" id="selectMenuUseBoolN" name="selectMenuUseBool" value="N"/><label for="selectMenuUseBoolN">아니요</label>
+									<!-- select id="selectMenuUseBool" name="selectMenuUseBool" >
+										<option value="">선택</option>
+										<option value="Y">Y</option>
+										<option value="N">N</option>
+									</select-->
+								</td>
+							</tr>
+							<tr>
+								<th>화면표시여부</th>
+								<td>
+									<input type="radio" id="selectMenuScreenUseBoolY" name="selectMenuScreenUseBool" value="Y"/><label for="selectMenuScreenUseBoolY">예</label>
+									<input type="radio" id="selectMenuScreenUseBoolN" name="selectMenuScreenUseBool" value="N"/><label for="selectMenuScreenUseBoolN">아니요</label>
+									<!-- select id="selectMenuScreenUseBool" name="selectMenuScreenUseBool" >
+										<option value="">선택</option>
+										<option value="Y">Y</option>
+										<option value="N">N</option>
+									</select-->
+								</td>
+							</tr>
+							<tr>
+								<th>링크</th>
+								<td><input type="text" id="selectMenuLink" name="selectMenuLink" /></td>
+							</tr>
+							<tr>
+								<th>권한</th>
+								<td><select id="selectMenuDenyCat"><option value="">선택</option></select>
+									<button type="button" class="btn" id="menuDenyAddBtn" onclick="menuDenyAdd()">추가</button>
+									<button type="button" class="btn" id="menuDenyDelBtn" onclick="menuDenyDel()">삭제</button>
+									<input type="text" id="selectMenuDeny" name="selectMenuDeny" style="border:0px;" readOnly />
+								</td>
+							</tr>
+							<tr>
+								<th>이동 할 메뉴 선택</th>
+								<td><select id="selectMenuMoveCd" >
+										<option value="">선택</option>
+									</select>
+								</td>
+							</tr>
+						</table>
 						<input type="hidden" id="selectMenuCd" name="selectMenuCd" value="" />
-						<dl>
-							<dt>메뉴명</dt>
-							<dd><input type="text" id="selectMenuNm" name="selectMenuNm" /></dd>
-							<dt>권한</dt>
-							<dd>
-								<select id="selectMenuDenyCat"><option value="">선택</option></select>
-								<button type="button" class="btn" id="menuDenyAddBtn" onclick="menuDenyAdd()">추가</button>
-								<input type="text" id="selectMenuDeny" name="selectMenuDeny" />
-							</dd>
-							<dt>사용여부</dt>
-							<dd>
-								<select id="selectMenuUseBool" name="selectMenuUseBool" >
-									<option value="">선택</option>
-									<option value="Y">Y</option>
-									<option value="N">N</option>
-								</select>
-							</dd>
-							<dt>링크</dt>
-							<dd><input type="text" id="selectMenuLink" name="selectMenuLink" /></dd>
-							<dt>이동 할 메뉴 선택</dt>
-							<dd>
-								<select id="selectMenuMoveCd" >
-									<option value="">선택</option>
-								</select>
-							</dd>
-						</dl>
-					</div>
-					<!-- 조회 버튼 -->
-					<div class="btn-wrap">
-						<button type="button" class="btn" id="menuSaveBtn" onclick="menuSave()">저장</button>
-						<button type="button" class="btn" id="menuUpdateBtn" onclick="menuUpdate()">수정</button>
-						<button type="button" class="btn" id="menuAddBtn" onclick="menuAdd()" rel="addLayer">추가</button>
-						<button type="button" class="btn" id="menuDelBtn" onclick="menuDel()">삭제</button>
+						
+						<!-- 조회 버튼 -->
+						<div class="btn-wrap">
+							<button type="button" class="btn" id="menuSaveBtn" onclick="menuSave()">저장</button>
+							<button type="button" class="btn" id="menuUpdateBtn" onclick="menuUpdate()">수정</button>
+							<button type="button" class="btn" id="menuAddBtn" onclick="menuAdd()">추가</button>
+							<button type="button" class="btn" id="menuDelBtn" onclick="menuDel()">삭제</button>
+						</div>
 					</div>
 				</div>
 				
 				<div class="inner">
-					<ul id="menuSortable">
-					</ul>
+					<div class="strong insuSum_tit">순서이동(drag)</div>
+					<div class="inner">
+						<ul id="menuSortable">
+						</ul>
+					</div>
 				</div>
 				
 			</div>
