@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script type="text/javascript">
+  var menuList = undefined; //실 메뉴
+  var newMenuList = new Array(); //메뉴 order관련 재정의
+  window.addEventListener("load", function(event) {
+    menuListSet(menuList).then(b=>menuScreenSet());
+  });
+  
+  function menuListSet(menu) {
+	return new Promise(function(resolve, reject) {
+		if(menu && Array.isArray(menu)) {
+			newMenuList = [];
+			menu.sort(function(a,b) {
+				if(a.depth > b.depth) return 1;
+				if(a.depth < b.depth) return -1;
+				return 0;
+			});
+			//depth별 메뉴배열 구조 변경
+			menu.forEach((e,i)=>{
+				if(newMenuList.length == 0) {
+					newMenuList[0] = new Array();
+					newMenuList[0].push(e);
+				}
+				else {
+					if(newMenuList.length > e.depth-1) {
+						if(e.depth == newMenuList[e.depth-1][0].depth) {
+							newMenuList[e.depth-1].push(e);
+						}
+					}
+					else {
+						newMenuList[e.depth-1] = new Array();
+						newMenuList[e.depth-1].push(e);
+					}
+				}
+			});
+			newMenuList.forEach(e=>{
+				e.sort(function(a,b) {
+					if(a.order > b.order) return 1;
+					if(a.order < b.order) return -1;
+					return 0;
+				});
+			});
+		}
+		
+		resolve(true);
+	});
+}
+
+function menuScreenSet() {
+	return new Promise(function(resolve, reject) {
+		//임시로 기존데이터 삭제
+		$("ul.dep1").children().remove();
+		$("ul.dep2-box").children().remove();
+		
+		let htmlStr = '';
+		let tempHtmlArr = new Array();
+		//즐겨찾기 관련 강제 세팅 : fnBookmark함수에서 없어질 수도 있음.
+		htmlStr = '<li id="li0"><a href="javascript:void(0)" rel="dep00">즐겨찾기</a></li>';
+		$("ul.dep1").append(htmlStr);
+		htmlStr = '<li class="dep00 active"><ul class="dep2" id="bookmark"></ul></li>';
+		$("ul.dep2-box").append(htmlStr);
+		
+		if(Array.isArray(newMenuList) && newMenuList.length > 0) {
+			newMenuList.forEach((e,i)=>{
+				if(Array.isArray(e) && e.length > 0) {
+					e.forEach((ele,idx)=>{
+						htmlStr = '';
+						switch(i) {
+							case 0 :
+								let rel = ele.code; 
+								if(Number(rel) < 10) rel = "0"+rel;
+								htmlStr = '<li><a href="javascript:void(0)" rel="dep'+rel+'">'+ele.name+'</a></li>';
+								$("ul.dep1").append(htmlStr);
+								break;
+							case 1 :
+								let nextBool = true;
+								if(tempHtmlArr.length > 0) {
+									tempHtmlArr.forEach(tempEle=>{
+										if(tempEle.id == "tempId"+ele.parent_code.split('-')[0]) {
+											if(tempEle.firstChild.childNodes.length > 0) {
+												let addBool = true;
+												tempEle.firstChild.childNodes.forEach(li=>{
+													if(li.id == "templi"+ele.code) addBool = false;
+												})
+												
+												if(addBool) tempEle.firstChild.append(createLi(ele.link,ele.code,ele.name));
+											}
+											else {
+												tempEle.firstChild.append(createLi(ele.link,ele.code,ele.name));
+											}
+											nextBool = false;
+										}
+									})
+								}
+								
+								if(nextBool) {
+									let template = document.createElement("template");
+									template.setAttribute("id","tempId"+ele.parent_code.split('-')[0]);
+									let ul = document.createElement("ul")
+									ul.classList = "dep2";
+									ul.append(createLi(ele.link,ele.code,ele.name));
+									template.append(ul);
+									tempHtmlArr.push(template);
+								}
+								break;
+							case 2 :
+								if(tempHtmlArr.length > 0) {
+									tempHtmlArr.forEach(tempEle=>{
+										if(tempEle.id == "tempId"+ele.parent_code.split('-')[0]) {
+											if(tempEle.firstChild.childNodes.length > 0) {
+												tempEle.firstChild.childNodes.forEach(li=>{
+													if(li.id == "templi"+ele.parent_code.split('-')[1]) {
+														if(li.childNodes.length > 1) {
+															li.childNodes[1].childNodes[0].append(createLi(ele.link,ele.code,ele.name));
+														}
+														else {
+															let div = document.createElement("div");
+															div.classList = "dep3";
+															let ul = document.createElement("ul");
+															ul.append(createLi(ele.link,ele.code,ele.name));
+															div.append(ul);
+															li.append(div);
+														}
+													}
+												})
+											}
+										}
+									});
+								}
+								break;
+						}
+					});
+				}
+			});
+			
+			tempHtmlArr.forEach(tempEle=>{
+				let li = document.createElement("li");
+				let relMatch = tempEle.id.replaceAll("tempId","");
+				if(Number(relMatch) < 10) relMatch = "0"+relMatch;
+				li.classList = "dep"+relMatch;
+				li.append(tempEle.firstChild);
+				$("ul.dep2-box").append(li);
+			});
+		}
+		//pub_ui.init(); //UI관련 스크립트 기능 넣을 경우 여기에 넣으면 됌.
+		resolve(true);
+	});
+}
+
+function createLi(href,code,name) {
+	let li = document.createElement("li");
+	let a = document.createElement("a");
+	let textNode = document.createTextNode(name);
+	
+	if(href == undefined || href == null || href == '') href = "javascript:void(0);";
+	a.setAttribute("href",href);
+	a.appendChild(textNode);
+	
+	li.setAttribute("id","templi"+code);
+	li.appendChild(a);
+	
+	return li;
+}
+</script>
+</head>
+<body>
+<div class="menu_gnb">
+  <div class="inner">
+    <ul class="dep1">
+      <li>
+        <a href="javascript:void(0)" rel="dep03">장기</a>
+      </li>
+      <li>
+        <a href="javascript:void(0)" rel="dep04">자동차</a>
+      </li>
+      <li>
+        <a href="javascript:void(0)" rel="dep07">보험료수납</a>
+      </li>
+    </ul>
+    <ul class="dep2-box">
+      <!-- 장기 -->
+      <li class="dep03">
+        <ul class="dep2">
+          <li><a href="">설계조회</a></li>
+          <li><a href="">계약조회</a></li>
+        </ul>
+      </li>
+      <!-- 자동차 -->
+      <li class="dep04">
+        <ul class="dep2">
+          <li><a href="">설계조회</a></li>
+          <li><a href="">계약조회</a></li>
+          <li><a href="">단기운전자배서</a></li>
+        </ul>
+      </li>
+      <!-- 보험료수납 -->
+      <li class="dep07">
+        <ul class="dep2">
+          <li>
+            <a href="javascript:void(0)">가상계좌</a>
+            <div class="dep3">
+              <ul>
+                <li><a href="">가상계좌 부여 및 조회</a></li>
+                <li><a href="">가상계좌 입금 조회</a></li>
+              </ul>
+            </div>
+          </li>
+          <li>
+            <a href="javascript:void(0)">신용카드</a>
+            <div class="dep3">
+              <ul>
+                <li><a href="">신용카드 승인</a></li>
+                <li><a href="">승인내역 조회</a></li>
+              </ul>
+            </div>
+          </li>
+          <li><a href="">장기계속분 즉시이체</a></li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</div>
+</body>
+</html>
