@@ -190,3 +190,47 @@ document.addEventListener("DOMContentLoaded", function(){
         }
     });
 });
+
+  
+//number 초기화
+function numberInit(num) {
+  if(isNaN(Number(num))) num = 0;
+  return Number(num);
+}
+
+//특수문자 HTML태그형식으로 변경
+function convertStrToHtml(str) {
+  str = str.replace(/\"/g,'&quot;');
+  str = str.replace(/\'/g,'&#39;');
+  str = str.replace(/,/g,'&#44;');
+
+  return str;
+}
+
+//HTML태그형식문자를 특수문자로 변경
+function convertHtmlToStr(str) {
+  str = str.replace(/&quot;/g,'\"');
+  str = str.replace(/&#39;/g,'\'');
+  str = str.replace(/&#44;/g,',');
+
+  return str;
+}
+
+//소수점 자릿수처리
+//호출예시 : numberToFiexed(30.33, 1)
+//예시결과값 : 30.3
+function numberToFiexed(num, positional) {
+  let result = num;
+
+  if(num.toString().indexOf('.') >= 0) {
+    let numArr = num.toString().split('.');
+    if(positional <= 0) {
+      result = numArr[0]; 
+    }
+    else {
+      result = numArr[0] +'.'+ numArr[1].substr(0,positional); 
+    }
+  }
+
+  return result;
+}
