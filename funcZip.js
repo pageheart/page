@@ -234,3 +234,17 @@ function numberToFiexed(num, positional) {
 
   return result;
 }
+
+//yyyyMMddHH
+let curDate = setDate.getFullYear() + ((setDate.getMonth()+1) < 10 ? '0'+(setDate.getMonth()+1) : (setDate.getMonth()+1)) + (setDate.getDate() < 10 ? '0'+setDate.getDate() : setDate.getDate()) + (setDate.getHours() < 10 ? '0'+setDate.getHours() : setDate.getHours());
+
+//observe
+let target = document.getElementById("MOprogressLayer");
+var observer = new MutationObserver(mutations => { 
+		mutations.forEach(mutation=> {
+			console.log(mutation.target.style.display);
+			document.getElementById("MOprogressLayerDim").style.display = mutation.target.style.display;
+		}) 
+	});
+var options = { attributes:true, attributeFilter:['style'] };
+observer.observe(target, options);
