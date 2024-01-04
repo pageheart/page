@@ -273,3 +273,27 @@ function getDayBetween(date1,date2) {
 	
 	return parseInt(interval / day, 10);
 }
+
+/**
+ * @alias 현재 날짜 가져오기(클라이언트)
+ * @param sprt : 출력구분자
+ * @exp 
+ * getToday("-");
+ */
+function getToday(sprt) {
+	var d = new Date();
+	var YY = d.getFullYear();
+	var MM = d.getMonth()+1;
+	var DD = d.getDate();
+	if(MM < 10) {
+		MM = "0" + MM;
+	}
+	if(DD < 10) {
+		DD = "0" + DD;
+	}
+	if(sprt != undefined) {
+		return YY + sprt + MM + sprt + DD;
+	} else {
+		return "" + YY + MM + DD;
+	}
+}	
