@@ -248,3 +248,28 @@ var observer = new MutationObserver(mutations => {
 	});
 var options = { attributes:true, attributeFilter:['style'] };
 observer.observe(target, options);
+
+/**
+ * @alias 두 날짜간 일자 차이를 리턴
+ * @param date1:시작일자
+ * @param date2:종료일자
+ * @return String
+ */
+function getDayBetween(date1,date2) {
+	if(!date1 || !date2) {
+		return ;
+	}
+	
+	date1 = date1.replace(/[^0-9]/g, "");
+	date2 = date2.replace(/[^0-9]/g, "");
+	var dt1m = Number(date1.substring(4, 6)) - 1;
+	var dt2m = Number(date2.substring(4, 6)) - 1;
+
+	var dt1 = new Date(date1.substring(0, 4), dt1m, date1.substring(6, 8));
+	var dt2 = new Date(date2.substring(0, 4), dt2m, date2.substring(6, 8));
+	var interval = dt2 - dt1;
+	
+	var day = 1000*60*60*24;
+	
+	return parseInt(interval / day, 10);
+}
